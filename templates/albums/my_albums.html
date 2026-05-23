@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}My Albums — ChronoFrame{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1 class="page-title">My Albums</h1><p class="page-subtitle">{{ albums.count }} album{{ albums.count|pluralize }}</p></div>
+  <a href="{% url 'albums:album-create' %}" class="btn btn-primary">+ New Album</a>
+</div>
+{% if albums %}
+  <div class="album-grid">
+    {% for album in albums %}
+    <a href="{% url 'albums:album-detail' album.pk %}" class="album-card">
+      {% if album.cover %}<img class="album-cover" src="{{ album.cover.url }}" alt="{{ album.title }}" loading="lazy">
+      {% else %}<div class="album-cover-placeholder">🕰️</div>{% endif %}
+      <div class="album-info">
+        <div class="album-title">{{ album.title }}</div>
+        <div class="album-meta"><span>{{ album.photo_count }} photo{{ album.photo_count|pluralize }}</span><span class="badge {% if album.visibility == 'public' %}badge-green{% else %}badge-gray{% endif %}">{{ album.visibility|capfirst }}</span></div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state"><div class="empty-state-icon">🕰️</div><h3>No albums yet</h3><a href="{% url 'albums:album-create' %}" class="btn btn-primary mt-3">Create first album</a></div>
+{% endif %}
+{% endblock %}

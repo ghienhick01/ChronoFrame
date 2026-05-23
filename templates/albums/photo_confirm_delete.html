@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Delete Photo{% endblock %}
+{% block content %}
+<div style="max-width:440px;margin:2rem auto;text-align:center;">
+  <div class="card"><div class="card-body">
+    <img src="{{ object.image.url }}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:1rem;">
+    <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:0.5rem;">Delete this photo?</h2>
+    <div class="flex gap-1 items-center" style="justify-content:center;margin-top:1rem;">
+      <form method="post">{% csrf_token %}<button type="submit" class="btn btn-danger">Delete</button></form>
+      <a href="{% url 'albums:album-detail' object.album.pk %}" class="btn btn-ghost">Cancel</a>
+    </div>
+  </div></div>
+</div>
+{% endblock %}

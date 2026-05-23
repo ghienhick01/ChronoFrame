@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}{{ album.title }} — ChronoFrame{% endblock %}
+{% block extra_css %}
+<style>.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;}.modal-overlay.open{display:flex;}.modal{background:var(--surface);border-radius:var(--radius);padding:1.75rem;max-width:480px;width:90%;max-height:90vh;overflow-y:auto;}</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ album.title }}</h1>
+    <div class="flex gap-1 items-center mt-1 flex-wrap">
+      <span class="badge {% if album.visibility == 'public' %}badge-green{% else %}badge-gray{% endif %}">{{ album.visibility|capfirst }}</span>
+      <span class="text-muted" style="font-size:0.8rem;">by {{ album.owner.username }} · {{ photos|length }} photos</span>
+    </div>
+    {% if album.description %}<p style="margin-top:0.5rem;color:var(--text-muted);font-size:0.9rem;">{{ album.description }}</p>{% endif %}
+  </div>
+  <div class="flex gap-1">
+    {% if is_owner or user_role in 'admin,contributor' %}<button onclick="document.getElementById('upload-modal').classList.add('open')" class="btn btn-primary btn-sm">+ Photos</button>{% endif %}
+    {% if is_owner %}<a href="{% url 'albums:album-edit' album.pk %}" class="btn btn-ghost btn-sm">Edit</a><a href="{% url 'albums:album-delete' album.pk %}" class="btn btn-danger btn-sm">Delete</a>{% endif %}
+  </div>
+</div>
+{% if photos %}
+  <div class="photo-grid">
+    {% for photo in photos %}
+    <a href="{% url 'albums:photo-detail' album.pk photo.pk %}" class="photo-thumb"><img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy"></a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state"><div class="empty-state-icon">🕰️</div><h3>No photos yet</h3></div>
+{% endif %}
+<div id="upload-modal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;">Upload Photos</h3>
+    <form method="post" action="{% url 'albums:photo-upload' album.pk %}" enctype="multipart/form-data">{% csrf_token %}
+      <div class="form-group"><label class="form-label">Images</label><input type="file" name="images" multiple accept="image/*" class="form-control"></div>
+      <div class="form-group"><label class="form-label">Title</label><input type="text" name="title" class="form-control" placeholder="Optional"></div>
+      <div class="form-group"><label class="form-label">Caption</label><textarea name="caption" class="form-control" rows="2"></textarea></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Upload</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
